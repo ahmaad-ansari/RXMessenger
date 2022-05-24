@@ -116,6 +116,7 @@
 }
 .dash-links{
     padding: 50px 0 50px 0;
+    list-style: none
 }
 .dash-links a{
     height: 50px;
