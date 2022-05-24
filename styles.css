@@ -188,6 +188,7 @@
     background-color: white;
     border-radius: 25px;
     box-shadow: 4px 0px 42px -8px #0004;
+    overflow: hidden;
 }
 
 
