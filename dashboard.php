@@ -62,7 +62,7 @@
             <div class="cell"></div>
         </div>
         <footer>
-            <h6>RX Messenger <?php echo date("Y");?> &copy</h6>
+            <h6>RX Messenger 2022 &copy</h6>
         </footer>
     </div>
 </body>
