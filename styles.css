@@ -9,8 +9,8 @@
     --sideBarWidth: 300px;
 
     /* PHARMACHOICE */
-    /* --primary: rgba(211,17,69);
-    --secondary: rgba(0,102,164); */
+    --compPrimary: rgba(211,17,69);
+    --compSecondary: rgba(0,102,164);
 
     /* CUSTOM */
     --primary: #0494fb;
@@ -73,8 +73,23 @@
 #user-profile h1{
     font-weight: 300;
 }
+.badges img{
+    width: 60px;
+    height: 60px;
+    /* background-color: white; */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .slim{
     font-weight: 100;
+}
+.primary{
+    color: var(--compPrimary);
+}
+.secondary{
+    color: var(--compSecondary);
 }
 
 .action-buttons{
@@ -130,4 +145,65 @@
     min-height: 100vh;
     width: calc(100% - var(--sideBarWidth));
     left: var(--sideBarWidth);
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    
+}
+.row{
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+}
+#mainRow{
+    height: 300px;
+}
+#mainRow .cell{    
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(211,17,69,1) 0%, rgba(0,102,164,1) 100%); */
+
+    /* opacity: 0.8;
+    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #ffffff 31px ), repeating-linear-gradient( #0494fb55, #0494fb ); */
+    
+    /* opacity: 0.8;
+    background-image:  linear-gradient(30deg, #0494fb 12%, transparent 12.5%, transparent 87%, #0494fb 87.5%, #0494fb), linear-gradient(150deg, #0494fb 12%, transparent 12.5%, transparent 87%, #0494fb 87.5%, #0494fb), linear-gradient(30deg, #0494fb 12%, transparent 12.5%, transparent 87%, #0494fb 87.5%, #0494fb), linear-gradient(150deg, #0494fb 12%, transparent 12.5%, transparent 87%, #0494fb 87.5%, #0494fb), linear-gradient(60deg, #0494fb77 25%, transparent 25.5%, transparent 75%, #0494fb77 75%, #0494fb77), linear-gradient(60deg, #0494fb77 25%, transparent 25.5%, transparent 75%, #0494fb77 75%, #0494fb77);
+    background-size: 34px 60px;
+    background-position: 0 0, 0 0, 17px 30px, 17px 30px, 0 0, 17px 30px; */
+}
+#mainRow .cell img{
+    /* filter: drop-shadow(0 0 40px #0494fb); */    
+    filter: drop-shadow(0 0 7px #0004);
+}
+.cell{
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 4px 0px 42px -8px #0004;
+}
+
+
+
+
+footer{
+    width: 100%;
+    padding: 25px;
+}
+footer h6{
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    color: var(--tertiary);
+    font-weight: 100;
+    width: 100%;
+    margin-bottom: 25px;
+    left: 0;
   }

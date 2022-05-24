@@ -22,13 +22,17 @@
                 <h1>AA</h1>
             </div>
             <h2 id="welcome-message"><span class="slim">Welcome</span> Ahmaad Ansari!</h2>
+            <div class="badges">
+                <!-- <img src="images/custom-company-logo.png" alt="logo"> -->
+                <!-- <h4><span class="primary">Pharma</span><span class="secondary">Choice</span></h4> -->
+            </div>
         </div>
 
         <nav>
             <ul class="dash-links">
                 <li><a id="current-link" href="dashboard.php">Dashboard</a></li>
-                <li><a href="#">Link 2</a></li>
-                <li><a href="#">Link 3</a></li>
+                <li><a href="#">Client Databases</a></li>
+                <li><a href="#">Manage Messages</a></li>
                 <li><a href="#">Link 4</a></li>
                 <li><a href="#">Link 5</a></li>
                 <li><a href="#">Link 6</a></li>
@@ -46,10 +50,27 @@
     </div>
 
     <div class="content">
-        <div class="header">
-
+        <div class="row" id="mainRow">
+            <div class="cell"><img src="images/custom-company-banner.png" alt="banner"></div>
         </div>
-
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <footer>
+            <h6>RX Messenger <?php echo date("Y");?> &copy</h6>
+        </footer>
     </div>
 </body>
 </html>
