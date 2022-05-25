@@ -27,15 +27,15 @@
         
         <nav>
             <ul class="dash-links">
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a id="current-link" href="patientInfo.php">Patient Information</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a id="current-link" href="patientInfo.html">Patient Information</a></li>
                 <li><a href="#">Employee Information</a></li>
                 <li><a href="#">Manage Messages</a></li>
             </ul>
         </nav>
 
         <div id="logout">
-            <button type="button" class="action-buttons" onclick="window.location.href='login.php'">
+            <button type="button" class="action-buttons" onclick="window.location.href='login.html'">
                 <i class="fa fa-sign-out"></i> Log out
             </button>
         </div>
@@ -49,7 +49,7 @@
             </div>
             <div class="headerRight">
                 <h4><span class="slim" id="greeting"></span></h4>
-                <a class="user-link" href="account.php">Ahmaad Ansari</a>
+                <a class="user-link" href="account.html">Ahmaad Ansari</a>
             </div>
         </header>
 
@@ -82,23 +82,36 @@
                                 <td><a class="table-icon edit"><i class="fa-regular fa-edit"></i></a></td>
                                 <td><a class="table-icon trash"><i class="fa-regular fa-trash-can"></i></a></td>
                             </tr>
-                            <?php
-                                for($i = 0; $i < 9; $i++){
-                                    echo('
-                                    <tr class="rowData">
-                                        <td><div id="user-profile"><h1>AA</h1></div></td>
-                                        <td>Ahmaad</td>
-                                        <td>Ansari</td>
-                                        <td>19</td>
-                                        <td>9054280000</td>
-                                        <td>placeholder@hotmail.com</td>
-                                        <td><a class="table-icon edit"><i class="fa-regular fa-edit"></i></a></td>
-                                        <td><a class="table-icon trash"><i class="fa-regular fa-trash-can"></i></a></td>
-                                    </tr>
-                                    ');
-                                }
-                            ?>
-                            
+                            <tr class="rowData">
+                                <td><div id="user-profile"><h1>AA</h1></div></td>
+                                <td>Ahmaad</td>
+                                <td>Ansari</td>
+                                <td>19</td>
+                                <td>9054280000</td>
+                                <td>placeholder@hotmail.com</td>
+                                <td><a class="table-icon edit"><i class="fa-regular fa-edit"></i></a></td>
+                                <td><a class="table-icon trash"><i class="fa-regular fa-trash-can"></i></a></td>
+                            </tr>
+                            <tr class="rowData">
+                                <td><div id="user-profile"><h1>AA</h1></div></td>
+                                <td>Ahmaad</td>
+                                <td>Ansari</td>
+                                <td>19</td>
+                                <td>9054280000</td>
+                                <td>placeholder@hotmail.com</td>
+                                <td><a class="table-icon edit"><i class="fa-regular fa-edit"></i></a></td>
+                                <td><a class="table-icon trash"><i class="fa-regular fa-trash-can"></i></a></td>
+                            </tr>
+                            <tr class="rowData">
+                                <td><div id="user-profile"><h1>AA</h1></div></td>
+                                <td>Ahmaad</td>
+                                <td>Ansari</td>
+                                <td>19</td>
+                                <td>9054280000</td>
+                                <td>placeholder@hotmail.com</td>
+                                <td><a class="table-icon edit"><i class="fa-regular fa-edit"></i></a></td>
+                                <td><a class="table-icon trash"><i class="fa-regular fa-trash-can"></i></a></td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -160,7 +173,7 @@
         </div>
 
         <footer>
-            <h6>RX Messenger <?php echo date("Y");?> &copy</h6>
+            <h6>RX Messenger 2022 &copy</h6>
         </footer>
     </div>
 </body>
