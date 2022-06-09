@@ -81,7 +81,7 @@ else :
     
     elseif(!$auth->isTokenValid($token)['success']) :
         $returnData = msg(0, 422, 'Expired token');
-
+        
     else :
         try {
 
