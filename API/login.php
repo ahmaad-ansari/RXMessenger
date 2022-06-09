@@ -45,58 +45,49 @@ else:
     // if(!filter_var($username, FILTER_VALIDATE_EMAIL)):
     //     $returnData = msg(0,422,'Invalid Email Address!');
     
-    // IF USERNAME IS LESS THAN 5 THEN SHOW THE ERROR
-    if(strlen($username) < 5):
-        $returnData = msg(0,422,'Your username must be at least 5 characters long!');
-    // IF PASSWORD IS LESS THAN 8 THEN SHOW THE ERROR
-    elseif(strlen($password) < 8):
-        $returnData = msg(0,422,'Your password must be at least 8 characters long!');
-
     // THE USER IS ABLE TO PERFORM THE LOGIN ACTION
-    else:
-        try{
-            
-            $fetch_user_by_username = "SELECT * FROM `users` WHERE `username`=:username";
-            $query_stmt = $conn->prepare($fetch_user_by_username);
-            $query_stmt->bindValue(':username', $username,PDO::PARAM_STR);
-            $query_stmt->execute();
 
-            // IF THE USER IS FOUNDED BY USERNAME
-            if($query_stmt->rowCount()):
-                $row = $query_stmt->fetch(PDO::FETCH_ASSOC);
-                $check_password = password_verify($password, $row['password']);
+    try{
+        
+        $fetch_user_by_username = "SELECT * FROM `users` WHERE `username`=:username";
+        $query_stmt = $conn->prepare($fetch_user_by_username);
+        $query_stmt->bindValue(':username', $username,PDO::PARAM_STR);
+        $query_stmt->execute();
 
-                // VERIFYING THE PASSWORD (IS CORRECT OR NOT?)
-                // IF PASSWORD IS CORRECT THEN SEND THE LOGIN TOKEN
-                if($check_password):
+        // IF THE USER IS FOUNDED BY USERNAME
+        if($query_stmt->rowCount()):
+            $row = $query_stmt->fetch(PDO::FETCH_ASSOC);
+            $check_password = password_verify($password, $row['password']);
 
-                    $jwt = new JwtHandler();
-                    $token = $jwt->jwtEncodeData(
-                        'http://localhost/prescriptionMessenger/',
-                        array("user_id"=> $row['id'])
-                    );
-                    
-                    $returnData = [
-                        'success' => 1,
-                        'message' => 'You have successfully logged in.',
-                        'token' => $token
-                    ];
+            // VERIFYING THE PASSWORD (IS CORRECT OR NOT?)
+            // IF PASSWORD IS CORRECT THEN SEND THE LOGIN TOKEN
+            if($check_password):
 
-                // IF INVALID PASSWORD
-                else:
-                    $returnData = msg(0,422,'Invalid username or password!');
-                endif;
+                $jwt = new JwtHandler();
+                $token = $jwt->jwtEncodeData(
+                    'http://localhost/prescriptionMessenger/',
+                    array("user_id"=> $row['id'])
+                );
+                
+                $returnData = [
+                    'success' => 1,
+                    'message' => 'You have successfully logged in.',
+                    'token' => $token
+                ];
 
-            // IF THE USER IS NOT FOUNDED BY USERNAME THEN SHOW THE FOLLOWING ERROR
+            // IF INVALID PASSWORD
             else:
                 $returnData = msg(0,422,'Invalid username or password!');
             endif;
-        }
-        catch(PDOException $e){
-            $returnData = msg(0,500,$e->getMessage());
-        }
 
-    endif;
+        // IF THE USER IS NOT FOUNDED BY USERNAME THEN SHOW THE FOLLOWING ERROR
+        else:
+            $returnData = msg(0,422,'Invalid username or password!');
+        endif;
+    }
+    catch(PDOException $e){
+        $returnData = msg(0,500,$e->getMessage());
+    }
 
 endif;
 

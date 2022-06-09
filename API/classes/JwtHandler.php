@@ -22,7 +22,7 @@ class JwtHandler
         $this->expire = $this->issuedAt + 3600;
 
         // Set your secret or signature
-        $this->jwt_secrect = "ahmaad_ansari_RXMessenger_2022";
+        $this->jwt_secrect = "RXM_2022";
     }
 
     public function jwtEncodeData($iss, $data)

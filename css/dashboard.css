@@ -126,3 +126,7 @@ body {
 .instructions, .instructions:hover{
   color: white;
 }
+
+.loader{
+  display: none;
+}

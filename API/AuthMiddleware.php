@@ -43,6 +43,26 @@ class Auth extends JwtHandler
         }
     }
 
+    public function isTokenValid($jwt_token)
+    {
+        
+        $data = $this->jwtDecodeData($jwt_token);
+
+        if (
+            isset($data['data']->user_id)
+        ) :
+            return [
+                "success" => 1
+            ];
+        else :
+            return [
+                "success" => 0,
+                "message" => $data['message'],
+            ];
+        endif;
+        
+    }
+
     protected function fetchUser($user_id)
     {
         try {
