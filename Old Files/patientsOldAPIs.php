@@ -5,10 +5,6 @@
     require __DIR__ . '/API Functions/API_patients.php';
 ?>
 
-<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-<!-- Should store birthday and not age so that we can update their age as time goes on -->
-<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -64,7 +60,8 @@
                         $phone = htmlentities($_POST['phone']);
                         $email = htmlentities($_POST['email']);                        
                         
-                        masterPatient("adduser", "null", $fName, $lName, $age, $gender, $phone, $email);
+                        // sends the variables to the registerEmployee function which processes the data via an API call
+                        registerPatient($fName, $lName, $age, $gender, $phone, $email);
                     }
 
                     if(isset($_POST['editPatientProfile'])){
@@ -77,14 +74,16 @@
                         $email = htmlentities($_POST['emailEdit']);                        
                         $id = htmlentities($_POST['idEdit']);                        
 
-                        masterPatient("edituser", $id, $fName, $lName, $age, $gender, $phone, $email);
+                        // sends the variables to the registerEmployee function which processes the data via an API call
+                        editPatient($id, $fName, $lName, $age, $gender, $phone, $email);
                     }
 
                     if(isset($_POST['deletePatientProfile'])){
                         // stores the entered values into corresponding variables                        
                         $id = htmlentities($_POST['idDelete']);                        
 
-                        masterPatient("deleteuser", $id, "null", "null", "null", "null", "null", "null");
+                        // sends the variables to the registerEmployee function which processes the data via an API call
+                        deletePatient($id);
                     }
                 ?>
 
@@ -99,7 +98,6 @@
                             <tr>
                                 <th scope="col">First Name</th>
                                 <th scope="col">Last Name</th>
-                                <!-- Should store birthday and not age so that we can update their age as time goes on -->
                                 <th scope="col">Age</th>
                                 <th scope="col">Gender</th>
                                 <th scope="col">Phone</th>
@@ -110,25 +108,25 @@
                         </thead>
                         <tbody>
                             <?php
-                                $patients = masterPatient("showall", "null", "null", "null", "null", "null", "null", "null");
+                                $patients = patientInformation("getallpatients");
                                 // loops through all the arrays within the data array
-                                // if($patients['success']){
-                                foreach($patients['data'] as $sub_array){
-                                    // prints table row for each registered user
-                                    echo('
-                                    <tr id="'.$sub_array['id'].'">
-                                        <td class="row-data">'.$sub_array['fName'].'</td>
-                                        <td class="row-data">'.$sub_array['lName'].'</td>
-                                        <td class="row-data">'.$sub_array['age'].'</td>
-                                        <td class="row-data">'.$sub_array['gender'].'</td>
-                                        <td class="row-data">'.$sub_array['phone'].'</td>
-                                        <td class="row-data">'.$sub_array['email'].'</td>
-                                        <td class="row-data"><button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="editPatientProfile()">Edit</button></td>
-                                        <td class="row-data"><button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="deletePatientProfile()">Delete</button></td>
-                                    </tr>
-                                    ');
+                                if($patients['success']){
+                                    foreach($patients['data'] as $sub_array){
+                                        // prints table row for each registered user
+                                        echo('
+                                        <tr id="'.$sub_array['id'].'">
+                                            <td class="row-data">'.$sub_array['fName'].'</td>
+                                            <td class="row-data">'.$sub_array['lName'].'</td>
+                                            <td class="row-data">'.$sub_array['age'].'</td>
+                                            <td class="row-data">'.$sub_array['gender'].'</td>
+                                            <td class="row-data">'.$sub_array['phone'].'</td>
+                                            <td class="row-data">'.$sub_array['email'].'</td>
+                                            <td class="row-data"><button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="editPatientProfile()">Edit</button></td>
+                                            <td class="row-data"><button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="deletePatientProfile()">Delete</button></td>
+                                        </tr>
+                                        ');
+                                    }
                                 }
-                                // }
                             ?>
                         </tbody>
                     </table>

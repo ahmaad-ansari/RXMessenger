@@ -1,9 +1,9 @@
 <?php
-function registerEmployee($fName, $lName, $username, $password, $role, $company){
+function masterEmployee($action, $fName, $lName, $username, $password, $company){
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://localhost/prescriptionMessenger/API/registerEmployee.php',
+    CURLOPT_URL => 'https://localhost/prescriptionMessenger/API/masterEmployee.php',
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => '',
     CURLOPT_MAXREDIRS => 10,
@@ -13,11 +13,12 @@ function registerEmployee($fName, $lName, $username, $password, $role, $company)
     CURLOPT_CUSTOMREQUEST => 'POST',
     CURLOPT_POSTFIELDS =>'{
         "token": "'.$_SESSION['USER_TOKEN'].'",
+        "action": "'.$action.'",
         "fName": "'.$fName.'",
         "lName": "'.$lName.'",
         "username": "'.$username.'",
         "password": "'.$password.'",
-        "role": "'.$role.'",
+        "role": "'.$_SESSION['USER_ROLE'].'",
         "company": "'.$company.'"
     }',
     CURLOPT_HTTPHEADER => array(
@@ -36,6 +37,9 @@ function registerEmployee($fName, $lName, $username, $password, $role, $company)
 
     // if the API returns a success then display message
     if($APIResponse['success']){
+        if($action == "showall"){
+            return $APIResponse;
+        }
         echo('
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Success!</strong> '.$APIResponse['message'].'
@@ -43,7 +47,7 @@ function registerEmployee($fName, $lName, $username, $password, $role, $company)
         </div>
         ');
     }
-    // if the user was not registered successfully, display error message
+    // if there was no success, display error message
     elseif(!$APIResponse['success']){
         echo('
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -61,38 +65,4 @@ function registerEmployee($fName, $lName, $username, $password, $role, $company)
         </div>
         ');
     }
-}
-
-function employeeInformation($action){
-    $curl = curl_init();
-
-    curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://localhost/prescriptionMessenger/API/getAllUsers.php',
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => '',
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 0,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => 'POST',
-    CURLOPT_POSTFIELDS =>'{
-        "token":"'.$_SESSION['USER_TOKEN'].'",
-        "action":"'.$action.'",
-        "role":"'.$_SESSION['USER_ROLE'].'"
-    }',
-    CURLOPT_HTTPHEADER => array(
-        'Content-Type: application/json'
-    ),
-    ));
-
-    // DEBUGGING PURPOSES ONLY ===================================
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    // ===========================================================
-
-    $response = curl_exec($curl);
-    curl_close($curl);
-    $APIResponse = json_decode($response, true);
-
-    return $APIResponse;
 }

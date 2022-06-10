@@ -62,7 +62,7 @@
                         
 
                         // sends the variables to the registerEmployee function which processes the data via an API call
-                        masterEmployee("adduser", $fName, $lName, $username, $password, $company);
+                        registerEmployee($fName, $lName, $username, $password, $role, $company);
                     }
                 ?>
 
@@ -139,21 +139,21 @@
                         </thead>
                         <tbody>
                             <?php
-                                $employees = masterEmployee("showall", "null", "null", "null", "null", "null");
+                                $employees = employeeInformation("getallemployees");
                                 // loops through all the arrays within the data array
-                                // if($employees['success']){
-                                foreach($employees['data'] as $sub_array){
-                                    // prints table row for each registered user
-                                    echo('
-                                    <tr>
-                                        <td class="row-data">'.$sub_array['fName'].'</td>
-                                        <td class="row-data">'.$sub_array['lName'].'</td>
-                                        <td class="row-data">'.$sub_array['username'].'</td>
-                                        <td class="row-data">'.$sub_array['role'].'</td>
-                                    </tr>
-                                    ');
+                                if($employees['success']){
+                                    foreach($employees['data'] as $sub_array){
+                                        // prints table row for each registered user
+                                        echo('
+                                        <tr>
+                                            <td class="row-data">'.$sub_array['fName'].'</td>
+                                            <td class="row-data">'.$sub_array['lName'].'</td>
+                                            <td class="row-data">'.$sub_array['username'].'</td>
+                                            <td class="row-data">'.$sub_array['role'].'</td>
+                                        </tr>
+                                        ');
+                                    }
                                 }
-                                // }
                             ?>
                         </tbody>
                     </table>
