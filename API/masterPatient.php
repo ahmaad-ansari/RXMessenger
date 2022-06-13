@@ -34,47 +34,50 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") :
 elseif (
     !isset($data->token)
     || !isset($data->action)
-    || !isset($data->id)
-    || !isset($data->fName)
-    || !isset($data->lName)
-    || !isset($data->age)
-    || !isset($data->gender)
-    || !isset($data->phone)
-    || !isset($data->email)
     || empty(trim($data->token))
     || empty(trim($data->action))
-    || empty(trim($data->id))
-    || empty(trim($data->fName))
-    || empty(trim($data->lName))
-    || empty(trim($data->age))
-    || empty(trim($data->gender))
-    || empty(trim($data->phone))
-    || empty(trim($data->email))
 ) :
 
-    $fields = ['fields' => ['token', 'action', 'id', 'fName', 'lName', 'age', 'gender', 'phone', 'email']];
+    $fields = ['fields' => ['token', 'action']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
 
 // IF THERE ARE NO EMPTY FIELDS THEN-
 else :
-
     $token = trim($data->token);
     $action = trim($data->action);
-    $id = trim($data->id);
-    $fName = trim($data->fName);
-    $lName = trim($data->lName);
-    $age = trim($data->age);
-    $gender = trim($data->gender);
-    $phone = trim($data->phone);
-    $email = trim($data->email);
 
     // check if token is valid first
     if (!$auth->isTokenValid($token)['success']) {
         $returnData = msg(0, 422, 'Expired token', null);
     }
 
-    else {
-        if ($action == "adduser") {
+    elseif($action == "adduser"){
+        if (
+            !isset($data->fName)
+            || !isset($data->lName)
+            || !isset($data->age)
+            || !isset($data->gender)
+            || !isset($data->phone)
+            || !isset($data->email)
+            || empty(trim($data->fName))
+            || empty(trim($data->lName))
+            || empty(trim($data->age))
+            || empty(trim($data->gender))
+            || empty(trim($data->phone))
+            || empty(trim($data->email))
+        ){
+            $fields = ['fields' => ['fName', 'lName', 'age', 'gender', 'phone', 'email']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
+        }
+        else{
+
+            $fName = trim($data->fName);
+            $lName = trim($data->lName);
+            $age = trim($data->age);
+            $gender = trim($data->gender);
+            $phone = trim($data->phone);
+            $email = trim($data->email);
+
             if (strlen($fName) < 3) :
                 $returnData = msg(0, 422, 'The first name must be at least 3 characters long!', null);
             
@@ -114,8 +117,19 @@ else :
                 }
             endif;
         }
-        
-        elseif ($action == "deleteuser") {
+    }
+
+    elseif($action == "deleteuser"){
+        if (
+            !isset($data->id)
+            || empty(trim($data->id))
+        ){
+            $fields = ['fields' => ['id']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
+        }
+        else{
+            $id = trim($data->id);
+
             // check if id exists in table!!!
             if(false) :
                 $returnData = msg(0, 422, 'Expired token', null);
@@ -133,8 +147,38 @@ else :
                 }
             endif;
         }
+    }
 
-        elseif ($action == "edituser"){
+    elseif($action == "edituser"){
+        if (
+            !isset($data->id)
+            || !isset($data->fName)
+            || !isset($data->lName)
+            || !isset($data->age)
+            || !isset($data->gender)
+            || !isset($data->phone)
+            || !isset($data->email)
+            || empty(trim($data->id))
+            || empty(trim($data->fName))
+            || empty(trim($data->lName))
+            || empty(trim($data->age))
+            || empty(trim($data->gender))
+            || empty(trim($data->phone))
+            || empty(trim($data->email))
+        ){
+            $fields = ['fields' => ['id', 'fName', 'lName', 'age', 'gender', 'phone', 'email']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields);
+        }
+        else{
+
+            $id = trim($data->id);
+            $fName = trim($data->fName);
+            $lName = trim($data->lName);
+            $age = trim($data->age);
+            $gender = trim($data->gender);
+            $phone = trim($data->phone);
+            $email = trim($data->email);
+
             if (strlen($fName) < 3) :
                 $returnData = msg(0, 422, 'The first name must be at least 3 characters long!', null);
             
@@ -165,26 +209,25 @@ else :
                 }
             endif;
         }
+    }
 
-        elseif ($action == "showall"){
-            try {
-    
-                $get_data = "SELECT * FROM `patients`";
-                $get_data_stmt = $conn->prepare($get_data);
-                $get_data_stmt->execute();
-    
-                if ($get_data_stmt->rowCount() <= 0) :
-                    $returnData = msg(0, 422, 'No results found!', null);
-    
-                else :
-                    $data = $get_data_stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-                    $returnData = msg(1, 201, 'Results found!', $data);
-    
-                endif;
-            } catch (PDOException $e) {
-                $returnData = msg(0, 500, $e->getMessage(), null);
-            }
+    elseif($action == "showall"){
+        try {
+            $get_data = "SELECT * FROM `patients`";
+            $get_data_stmt = $conn->prepare($get_data);
+            $get_data_stmt->execute();
+
+            if ($get_data_stmt->rowCount() <= 0) :
+                $returnData = msg(0, 422, 'No results found!', null);
+
+            else :
+                $data = $get_data_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $returnData = msg(1, 201, 'Results found!', $data);
+
+            endif;
+        } catch (PDOException $e) {
+            $returnData = msg(0, 500, $e->getMessage(), null);
         }
     }
 

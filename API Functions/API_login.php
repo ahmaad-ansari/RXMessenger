@@ -96,7 +96,6 @@ function getCurrentUser(){
         $_SESSION['USER_USERNAME'] = $APIResponse['user']['username'];
         $_SESSION['USER_ROLE'] = $APIResponse['user']['role'];
         $_SESSION['USER_COMPANY'] = $APIResponse['user']['company'];
-
-        return $APIResponse;
     }
+    return $APIResponse;
 }

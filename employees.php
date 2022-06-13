@@ -3,6 +3,9 @@
     session_start();
 
     require __DIR__ . '/API Functions/API_employees.php';
+    require __DIR__ . '/authentication.php';
+
+    userHasAdminAccess();
 ?>
 
 <!doctype html>
@@ -23,18 +26,17 @@
 </head>
 <body>
 
-<header class="navbar navbar-light sticky-top bg-light flex-md-nowrap p-0 shadow ">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php">RXMessenger</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="navbar-nav">
-        <div class="nav-item text-nowrap user-button bg-primary">
-            <a class="nav-link px-3" href="account.php"><?php echo($_SESSION['USER_FNAME'] . " " . $_SESSION['USER_LNAME']); ?></a>
+    <header class="navbar navbar-light sticky-top bg-light flex-md-nowrap p-0 shadow ">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php">RXMessenger</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-nav">
+            <div class="nav-item text-nowrap user-button bg-primary">
+                <a class="nav-link px-3" href="account.php"><?php echo($_SESSION['USER_FNAME'] . " " . $_SESSION['USER_LNAME']); ?></a>
+            </div>
         </div>
-    </div>
-</header>
-<body>
+    </header>
     <div class="container-fluid">
         <div class="row">
             <!-- Loads the navigation bar -->
@@ -62,10 +64,27 @@
                         
 
                         // sends the variables to the registerEmployee function which processes the data via an API call
-                        masterEmployee("adduser", $fName, $lName, $username, $password, $company);
+                        addUser($fName, $lName, $username, $password, $role, $company);
+                    }
+
+                    if(isset($_POST['editUserProfile'])){
+                        // stores the entered values into corresponding variables
+                        $fName = htmlentities($_POST['fNameEdit']);
+                        $lName = htmlentities($_POST['lNameEdit']);
+                        $username = htmlentities($_POST['usernameEdit']);
+                        $role = htmlentities($_POST['roleEdit']);                 
+                        $id = htmlentities($_POST['idEdit']);                        
+
+                        editUser($id, $fName, $lName, $username, $role);
+                    }
+                    
+                    if(isset($_POST['deleteUserProfile'])){
+                        // stores the entered values into corresponding variables                        
+                        $id = htmlentities($_POST['idDelete']);                        
+
+                        deleteUser($id);
                     }
                 ?>
-
 
                 <h6 class="bg-secondary p-3 text-white d-flex justify-content-between">
                     Register Employee Profile
@@ -135,21 +154,25 @@
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Username</th>
                                 <th scope="col">Role</th>
+                                <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                                $employees = masterEmployee("showall", "null", "null", "null", "null", "null");
+                                $employees = showAll();
                                 // loops through all the arrays within the data array
                                 // if($employees['success']){
                                 foreach($employees['data'] as $sub_array){
                                     // prints table row for each registered user
                                     echo('
-                                    <tr>
+                                    <tr id="'.$sub_array['id'].'">
                                         <td class="row-data">'.$sub_array['fName'].'</td>
                                         <td class="row-data">'.$sub_array['lName'].'</td>
                                         <td class="row-data">'.$sub_array['username'].'</td>
                                         <td class="row-data">'.$sub_array['role'].'</td>
+                                        <td class="row-data"><button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="editUserProfile()">Edit</button></td>
+                                        <td class="row-data"><button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProfileModal" style="--bs-btn-padding-y: 0rem; --bs-btn-padding-x: .25rem; --bs-btn-font-size: .75rem;" onclick="deleteUserProfile()">Delete</button></td>
                                     </tr>
                                     ');
                                 }
@@ -160,6 +183,129 @@
                 </div>
 
             </main>
+
+            <!-- EDIT PROFILE MODAL -->
+            <div class="modal fade" id="editProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Edit Profile</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="text-center" id="editUserProfile" method="POST">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="idEdit" min="0" max="125" name="idEdit" readonly="readonly" required>
+                                            <label for="idEdit">ID</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="fNameEdit" maxlength="50" name="fNameEdit" required>
+                                            <label for="fNameEdit">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="lNameEdit" maxlength="50" name="lNameEdit" required>
+                                            <label for="lNameEdit">Last Name</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2">
+                                    
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="usernameEdit" maxlength="50" name="usernameEdit" required>
+                                            <label for="usernameEdit">Username</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="roleEdit" name="roleEdit" required>
+                                                <option selected disabled hidden></option>
+                                                <option value="Admin">Admin</option>
+                                                <option value="Employee">Employee</option>
+                                            </select>
+                                            <label for="roleEdit">Choose a role</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer p-1">
+                                    <button type="button" class="btn btn-secondary y-0" data-bs-dismiss="modal">Close</button>
+                                    <input type="submit" class="btn btn-md btn-primary y-0" value="Update" name="editUserProfile">
+                                </div>
+                            </form>                    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- DELETE PROFILE MODAL -->
+            <div class="modal fade" id="deleteProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Delete Profile</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="text-center" id="deleteUserProfile" method="POST">
+                            <div class="row g-2 mb-2">
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="idDelete" min="0" max="125" name="idDelete" readonly="readonly" required>
+                                            <label for="idDelete">ID</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="fNameDelete" maxlength="50" name="fNameDelete" disabled>
+                                            <label for="fNameDelete">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="lNameDelete" maxlength="50" name="lNameDelete" disabled>
+                                            <label for="lNameDelete">Last Name</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2">
+                                    
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="usernameDelete" maxlength="50" name="usernameDelete" disabled>
+                                            <label for="usernameDelete">Username</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="passwordDelete" maxlength="50" name="passwordDelete" disabled>
+                                            <label for="passwordDelete">Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <select class="form-select" id="roleDelete" name="roleDelete" disabled>
+                                                <option selected disabled hidden></option>
+                                                <option value="Admin">Admin</option>
+                                                <option value="Employee">Employee</option>
+                                            </select>
+                                            <label for="roleDelete">Choose a role</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer p-1">
+                                    <button type="button" class="btn btn-secondary y-0" data-bs-dismiss="modal">Close</button>
+                                    <input type="submit" class="btn btn-md btn-danger y-0" value="Delete" name="deleteUserProfile">
+                                </div>
+                            </form>                    
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- INSTRUCTION MODALS -->
             <div class="modal fade" id="registerEmployeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -220,4 +366,42 @@
     $(document).ready(function () {
         $('#employeeProfilesTable').DataTable();
     });
+
+    function editUserProfile(){
+        //this gives id of tr whose button was clicked
+        var rowId = event.target.parentNode.parentNode.id;
+        
+        /*returns array of all elements with "row-data" class within the row with given id*/
+        var data = document.getElementById(rowId).querySelectorAll(".row-data"); 
+        
+        var fName = data[0].innerHTML;
+        var lName = data[1].innerHTML;
+        var username = data[2].innerHTML;
+        var role = data[3].innerHTML;
+        
+        document.getElementById('idEdit').value = rowId;
+        document.getElementById('fNameEdit').value = fName;
+        document.getElementById('lNameEdit').value = lName;
+        document.getElementById('usernameEdit').value = username;
+        document.getElementById('roleEdit').value = role;
+    }
+
+    function deleteUserProfile(){
+        //this gives id of tr whose button was clicked
+        var rowId = event.target.parentNode.parentNode.id;
+        
+        /*returns array of all elements with "row-data" class within the row with given id*/
+        var data = document.getElementById(rowId).querySelectorAll(".row-data"); 
+        
+        var fName = data[0].innerHTML;
+        var lName = data[1].innerHTML;
+        var username = data[2].innerHTMLs;
+        var role = data[3].innerHTML;
+        
+        document.getElementById('idDelete').value = rowId;
+        document.getElementById('fNameDelete').value = fName;
+        document.getElementById('lNameDelete').value = lName;        
+        document.getElementById('usernameDelete').value = username;
+        document.getElementById('roleDelete').value = role;
+    }
 </script>

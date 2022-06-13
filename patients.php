@@ -3,6 +3,8 @@
     session_start();
 
     require __DIR__ . '/API Functions/API_patients.php';
+    require __DIR__ . '/authentication.php';
+
 ?>
 
 <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
@@ -26,19 +28,17 @@
     <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 <body>
-
-<header class="navbar navbar-light sticky-top bg-light flex-md-nowrap p-0 shadow ">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php">RXMessenger</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="navbar-nav">
-        <div class="nav-item text-nowrap user-button bg-primary">
-            <a class="nav-link px-3" href="account.php"><?php echo($_SESSION['USER_FNAME'] . " " . $_SESSION['USER_LNAME']); ?></a>
+    <header class="navbar navbar-light sticky-top bg-light flex-md-nowrap p-0 shadow ">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php">RXMessenger</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-nav">
+            <div class="nav-item text-nowrap user-button bg-primary">
+                <a class="nav-link px-3" href="account.php"><?php echo($_SESSION['USER_FNAME'] . " " . $_SESSION['USER_LNAME']); ?></a>
+            </div>
         </div>
-    </div>
-</header>
-<body>
+    </header>
     <div class="container-fluid">
         <div class="row">
             <!-- Loads the navigation bar -->
@@ -64,7 +64,7 @@
                         $phone = htmlentities($_POST['phone']);
                         $email = htmlentities($_POST['email']);                        
                         
-                        masterPatient("adduser", "null", $fName, $lName, $age, $gender, $phone, $email);
+                        addUser($fName, $lName, $age, $gender, $phone, $email);
                     }
 
                     if(isset($_POST['editPatientProfile'])){
@@ -77,14 +77,14 @@
                         $email = htmlentities($_POST['emailEdit']);                        
                         $id = htmlentities($_POST['idEdit']);                        
 
-                        masterPatient("edituser", $id, $fName, $lName, $age, $gender, $phone, $email);
+                        editUser($id, $fName, $lName, $age, $gender, $phone, $email);
                     }
 
                     if(isset($_POST['deletePatientProfile'])){
                         // stores the entered values into corresponding variables                        
                         $id = htmlentities($_POST['idDelete']);                        
 
-                        masterPatient("deleteuser", $id, "null", "null", "null", "null", "null", "null");
+                        deleteUser($id);
                     }
                 ?>
 
@@ -110,7 +110,7 @@
                         </thead>
                         <tbody>
                             <?php
-                                $patients = masterPatient("showall", "null", "null", "null", "null", "null", "null", "null");
+                                $patients = showAll();
                                 // loops through all the arrays within the data array
                                 // if($patients['success']){
                                 foreach($patients['data'] as $sub_array){
@@ -228,6 +228,12 @@
                                 <div class="row g-2 mb-2">
                                     <div class="col-md">
                                         <div class="form-floating">
+                                            <input type="number" class="form-control" id="idEdit" min="0" max="125" name="idEdit" readonly="readonly" required>
+                                            <label for="idEdit">ID</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-floating">
                                             <input type="text" class="form-control" id="fNameEdit" maxlength="50" name="fNameEdit" required>
                                             <label for="fNameEdit">First Name</label>
                                         </div>
@@ -240,12 +246,6 @@
                                     </div>
                                 </div>
                                 <div class="row g-2 mb-2">
-                                    <div class="col-md">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control" id="idEdit" min="0" max="125" name="idEdit" readonly="readonly" required>
-                                            <label for="idEdit">ID</label>
-                                        </div>
-                                    </div>
                                     <div class="col-md">
                                         <div class="form-floating">
                                             <input type="number" class="form-control" id="ageEdit" min="0" max="125" name="ageEdit" required>
@@ -287,7 +287,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- DELETE PROFILE MODAL -->
             <div class="modal fade" id="deleteProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -299,6 +298,12 @@
                         <div class="modal-body">
                             <form class="text-center" id="deletePatientProfile" method="POST">
                                 <div class="row g-2 mb-2">
+                                    <div class="col-md">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" id="idDelete" min="0" max="125" name="idDelete" readonly="readonly" required>
+                                            <label for="idDelete">ID</label>
+                                        </div>
+                                    </div>
                                     <div class="col-md">
                                         <div class="form-floating">
                                             <input type="text" class="form-control" id="fNameDelete" maxlength="50" name="fNameDelete" readonly="readonly" required>
@@ -313,12 +318,6 @@
                                     </div>
                                 </div>
                                 <div class="row g-2 mb-2">
-                                    <div class="col-md">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control" id="idDelete" min="0" max="125" name="idDelete" readonly="readonly" required>
-                                            <label for="idDelete">ID</label>
-                                        </div>
-                                    </div>
                                     <div class="col-md">
                                         <div class="form-floating">
                                             <input type="number" class="form-control" id="ageDelete" min="0" max="125" name="ageDelete" readonly="readonly" required>
@@ -360,7 +359,6 @@
                     </div>
                 </div>
             </div>
-
 
             <!-- INSTRUCTION MODALS -->
             <div class="modal fade" id="patientProfilesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

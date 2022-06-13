@@ -19,7 +19,7 @@ class JwtHandler
         $this->issuedAt = time();
 
         // Token Validity (3600 second = 1hr)
-        $this->expire = $this->issuedAt + 3600;
+        $this->expire = $this->issuedAt + (3600 * 3);
 
         // Set your secret or signature
         $this->jwt_secrect = "RXM_2022";

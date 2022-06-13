@@ -34,22 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") :
 elseif (
     !isset($data->token)
     || !isset($data->action)
-    || !isset($data->fName)
-    || !isset($data->lName)
-    || !isset($data->username)
-    || !isset($data->password)
-    || !isset($data->role)
-    || !isset($data->company)
     || empty(trim($data->token))
-    || empty(trim($data->fName))
-    || empty(trim($data->lName))
-    || empty(trim($data->username))
-    || empty(trim($data->password))
-    || empty(trim($data->role))
-    || empty(trim($data->company))
+    || empty(trim($data->action))
 ) :
 
-    $fields = ['fields' => ['token', 'action', 'fName', 'lName', 'username', 'password', 'role', 'company']];
+    $fields = ['fields' => ['token', 'action']];
     $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields, null);
 
 // IF THERE ARE NO EMPTY FIELDS THEN-
@@ -57,20 +46,38 @@ else :
 
     $token = trim($data->token);
     $action = trim($data->action);
-    $fName = trim($data->fName);
-    $lName = trim($data->lName);
-    $username = trim($data->username);
-    $password = trim($data->password);
-    $role = trim($data->role);
-    $company = trim($data->company);
 
     // check if token is valid
     if (!$auth->isTokenValid($token)['success']) {
         $returnData = msg(0, 422, 'Expired token', null);
     }
 
-    else { 
-        if($action == "adduser"){
+    elseif($action == "adduser"){
+        if (
+            !isset($data->fName)
+            || !isset($data->lName)
+            || !isset($data->username)
+            || !isset($data->password)
+            || !isset($data->role)
+            || !isset($data->company)
+            || empty(trim($data->fName))
+            || empty(trim($data->lName))
+            || empty(trim($data->username))
+            || empty(trim($data->password))
+            || empty(trim($data->role))
+            || empty(trim($data->company))
+        ) {
+            $fields = ['fields' => ['fName', 'lName', 'username', 'password', 'role', 'company']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields, null);
+        }
+        else{
+            $fName = trim($data->fName);
+            $lName = trim($data->lName);
+            $username = trim($data->username);
+            $password = trim($data->password);
+            $role = trim($data->role);
+            $company = trim($data->company);
+
             if (strlen($username) < 5) :
                 $returnData = msg(0, 422, 'Your username must be at least 5 characters long!', null);
     
@@ -117,8 +124,108 @@ else :
                 }
             endif;
         }
+    }
 
-        elseif($action == "showall"){
+    elseif($action == "deleteuser"){
+        if (
+            !isset($data->id)
+            || empty(trim($data->id))
+        ) {
+            $fields = ['fields' => ['id']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields, null);
+        }
+
+        else{
+            $id = trim($data->id);
+
+            // check if id exists in table!!!
+            if(false) :
+                $returnData = msg(0, 422, 'Expired token', null);
+        
+            else :
+                try {
+                    $delete_query = "DELETE FROM `users` WHERE id = $id";      
+                    $delete_stmt = $conn->prepare($delete_query);
+                    $delete_stmt->execute();
+                    
+                    $returnData = msg(1, 201, 'User has been successfull removed.', null);
+        
+                } catch (PDOException $e) {
+                    $returnData = msg(0, 500, $e->getMessage());
+                }
+            endif;
+        }
+    }
+
+    elseif($action == "edituser"){
+        if (
+            !isset($data->id)
+            || !isset($data->fName)
+            || !isset($data->lName)
+            || !isset($data->username)
+            || !isset($data->role)
+            || empty(trim($data->id))
+            || empty(trim($data->fName))
+            || empty(trim($data->lName))
+            || empty(trim($data->username))
+            || empty(trim($data->role))
+        ) {
+            $fields = ['fields' => ['id', 'fName', 'lName', 'username', 'role']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields, null);
+        }
+        else{
+            $fName = trim($data->fName);
+            $id = trim($data->id);
+            $lName = trim($data->lName);
+            $username = trim($data->username);
+            $role = trim($data->role);
+
+            if (strlen($username) < 5) :
+                $returnData = msg(0, 422, 'Your username must be at least 5 characters long!', null);
+    
+            elseif (strlen($fName) < 3) :
+                $returnData = msg(0, 422, 'Your first name must be at least 3 characters long!', null);
+            
+            elseif (strlen($lName) < 3) :
+                $returnData = msg(0, 422, 'Your last name must be at least 3 characters long!', null);
+    
+            else :
+                try {
+    
+                    $check_username = "SELECT `username` FROM `users` WHERE `username`=:username AND id != $id";
+                    $check_username_stmt = $conn->prepare($check_username);
+                    $check_username_stmt->bindValue(':username', $username, PDO::PARAM_STR);
+                    $check_username_stmt->execute();
+    
+                    if ($check_username_stmt->rowCount()) :
+                        $returnData = msg(0, 422, 'This username is already in use!', null);
+                    
+                    else :
+                        $update_query = "UPDATE `users` SET fName = '$fName', lName = '$lName', username = '$username', role = '$role' WHERE id = $id";      
+                        $update_stmt = $conn->prepare($update_query);
+                        $update_stmt->execute();
+                        
+                        $returnData = msg(1, 201, 'User has been successfull updated.', null);
+                    endif;
+        
+                } catch (PDOException $e) {
+                    $returnData = msg(0, 500, $e->getMessage(), null);
+                }
+            endif;
+        }
+    }
+
+    elseif($action == "showall"){
+        if (
+            !isset($data->role)
+            || empty(trim($data->role))
+        ) {
+            $fields = ['fields' => ['role']];
+            $returnData = msg(0, 422, 'Please Fill in all Required Fields!', $fields, null);
+        }
+        else{
+            $role = trim($data->role);
+
             if ($role != "Admin") :
                 $returnData = msg(0, 422, 'You must be an admin to access this data!', null);
              

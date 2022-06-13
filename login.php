@@ -1,6 +1,7 @@
 <?php
     // Start new or resume existing session
     session_start();
+    session_destroy();
 
     require __DIR__ . '/API Functions/API_login.php';
 ?>
@@ -55,6 +56,8 @@
                 // stores the entered username and password into corresponding variables
                 $username = htmlentities($_POST['username']);
                 $password = htmlentities($_POST['password']);
+
+                session_start();
 
                 // sends the variables to the login function which processes the data via an API call
                 login($username, $password);
